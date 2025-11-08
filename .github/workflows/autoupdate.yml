@@ -1,0 +1,81 @@
+name: brew autoupdate
+
+on:
+  schedule:
+    # run every 4 hours
+    - cron: '20 */4 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-casks:
+    runs-on: macos-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@main
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Check for updates
+        id: check
+        run: |
+          brew tap ${{ github.repository }}
+          
+          # Get list of casks
+          CASKS=$(ls Casks/*.rb | xargs -n1 basename | sed 's/\.rb$//')
+          
+          echo "Checking casks for updates..."
+          UPDATES=""
+          
+          for CASK in $CASKS; do
+            echo "Checking $CASK..."
+            
+            # Get current version
+            CURRENT_VERSION=$(brew info --cask --json=v2 "${{ github.repository_owner }}/tap/$CASK" | jq -r '.casks[0].version')
+            
+            # Check for latest version
+            LATEST_INFO=$(brew livecheck --cask "${{ github.repository_owner }}/tap/$CASK" --json 2>/dev/null || echo '[]')
+            LATEST_VERSION=$(echo "$LATEST_INFO" | jq -r '.[0].version.latest // empty')
+            
+            if [ -n "$LATEST_VERSION" ] && [ "$LATEST_VERSION" != "$CURRENT_VERSION" ]; then
+              echo "Update available for $CASK: $CURRENT_VERSION -> $LATEST_VERSION"
+              UPDATES="$UPDATES$CASK:$LATEST_VERSION "
+            else
+              echo "No update for $CASK (current: $CURRENT_VERSION)"
+            fi
+          done
+          
+          echo "updates=$UPDATES" >> $GITHUB_OUTPUT
+
+      - name: Update casks
+        if: steps.check.outputs.updates != ''
+        run: |
+          UPDATES="${{ steps.check.outputs.updates }}"
+          
+          for UPDATE in $UPDATES; do
+            CASK=$(echo "$UPDATE" | cut -d: -f1)
+            VERSION=$(echo "$UPDATE" | cut -d: -f2)
+            
+            echo "Updating $CASK to $VERSION..."
+            
+            # Update the cask using brew bump-cask-pr (dry run to get the changes)
+            brew bump-cask-pr --write-only --version="$VERSION" "${{ github.repository_owner }}/tap/$CASK" || {
+              echo "Failed to update $CASK, skipping..."
+              continue
+            }
+            
+            # Commit and push directly to main
+            git add "Casks/$CASK.rb"
+            git commit -m "$CASK $VERSION"
+            git push origin main
+            
+            echo "Successfully updated $CASK to $VERSION"
+          done
