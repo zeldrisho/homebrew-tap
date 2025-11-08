@@ -30,11 +30,11 @@ jobs:
           brew tap ${{ github.repository }}
           
           # Get list of casks
-          CASKS=$(ls Casks/*.rb | xargs -n1 basename | sed 's/\.rb$//')
-          
+          CASKS=$(find Casks -name "*.rb" -exec basename {} \; | sed 's/\.rb$//')
+
           echo "Checking casks for updates..."
           UPDATES=""
-          
+
           for CASK in $CASKS; do
             echo "Checking $CASK..."
             
@@ -53,7 +53,7 @@ jobs:
             fi
           done
           
-          echo "updates=$UPDATES" >> $GITHUB_OUTPUT
+          echo "updates=$UPDATES" >> "$GITHUB_OUTPUT"
 
       - name: Update casks
         if: steps.check.outputs.updates != ''
