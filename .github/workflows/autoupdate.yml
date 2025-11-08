@@ -59,23 +59,31 @@ jobs:
         if: steps.check.outputs.updates != ''
         run: |
           UPDATES="${{ steps.check.outputs.updates }}"
-          
+          FAILED_UPDATES=""
+
           for UPDATE in $UPDATES; do
             CASK=$(echo "$UPDATE" | cut -d: -f1)
             VERSION=$(echo "$UPDATE" | cut -d: -f2)
-            
+
             echo "Updating $CASK to $VERSION..."
-            
+
             # Update the cask using brew bump-cask-pr (dry run to get the changes)
-            brew bump-cask-pr --write-only --version="$VERSION" "${{ github.repository_owner }}/tap/$CASK" || {
-              echo "Failed to update $CASK, skipping..."
+            if ! brew bump-cask-pr --write-only --version="$VERSION" "${{ github.repository_owner }}/tap/$CASK"; then
+              echo "Failed to update $CASK to $VERSION"
+              FAILED_UPDATES="$FAILED_UPDATES $CASK"
               continue
-            }
-            
+            fi
+
             # Commit and push directly to main
             git add "Casks/$CASK.rb"
             git commit -m "$CASK $VERSION"
             git push origin main
-            
+
             echo "Successfully updated $CASK to $VERSION"
           done
+
+          # Fail the workflow if any updates failed
+          if [ -n "$FAILED_UPDATES" ]; then
+            echo "The following casks failed to update:$FAILED_UPDATES"
+            exit 1
+          fi
