@@ -4,9 +4,9 @@ cask "kdeconnect" do
   # TODO: eventually also handle release versions (e.g. release-24.08 etc.)?
   base_url = "https://cdn.kde.org/ci-builds/network/kdeconnect-kde/master/macos-#{arch}"
 
-  version "5508"
-  sha256 arm:   "d59b04e989369f9c4c783e347f9ae73cfeb0bea38c27fc802f002986b34d0da6",
-         intel: "ff80b80c67754db66f77842f02730e2aa42842cb6da3dd46f47850081c13064b"
+  version "5513"
+  sha256 arm:   "d42ac4b20677de1108876d918a6e8a7dee5a5c2d7aca9d77c8f56941d00cbd35",
+         intel: "7025d6b23acd3486f15ccd7edb7fd889a94baaccc248735b19002b8a82677b20"
 
   url "#{base_url}/kdeconnect-kde-master-#{version}-macos-clang-#{arch}.dmg"
   name "KDE Connect"
