@@ -18,7 +18,7 @@ cask "kdeconnect" do
     regex(/href=.*?kdeconnect-kde-master-(\d+(?:)+)-macos-clang-#{arch}\.dmg/i)
   end
 
-  depends_on macos: ">= :monterey"
+  depends_on macos: ">= :ventura"
 
   app "KDE Connect.app"
   binary "#{appdir}/KDE Connect.app/Contents/MacOS/kdeconnect-cli",
