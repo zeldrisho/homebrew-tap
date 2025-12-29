@@ -2,7 +2,7 @@
 [![casks](https://img.shields.io/github/directory-file-count/zeldrisho/homebrew-tap/Casks?type=file&extension=rb&style=flat&label=casks)](https://github.com/zeldrisho/homebrew-tap/tree/main/Casks)
 [![repo size](https://img.shields.io/github/repo-size/zeldrisho/homebrew-tap.svg?style=flat-square)](https://github.com/zeldrisho/homebrew-tap)
 
-My personal [Homebrew tap](https://docs.brew.sh/Taps) for macOS applications missing from [official taps](https://github.com/Homebrew/homebrew-cask), or alternate versions thereof
+My personal [Homebrew tap](https://docs.brew.sh/Taps) for macOS applications missing from [official taps](https://github.com/Homebrew/homebrew-cask)
 
 ## Usage
 
@@ -15,7 +15,7 @@ brew tap zeldrisho/tap
 
 Install a cask from this tap:
 ```bash
-brew install --cask zeldrisho/tap/<cask>
+brew install --cask <cask>
 ```
 
 ## Casks
