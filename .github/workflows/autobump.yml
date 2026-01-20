@@ -1,0 +1,175 @@
+name: Autobump
+
+on:
+  schedule:
+    # Run every 4 hours
+    - cron: '20 */4 * * *'
+  workflow_dispatch:
+    inputs:
+      type:
+        description: 'What to check for updates'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - formulas
+          - casks
+
+env:
+  HOMEBREW_DEVELOPER: 1
+  HOMEBREW_NO_AUTO_UPDATE: 1
+  HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  # =============================================================================
+  # UPDATE FORMULAS - Check and bump formula versions
+  # =============================================================================
+  update-formulas:
+    name: Update Formulas
+    if: github.event.inputs.type != 'casks'
+    runs-on: macos-latest
+    steps:
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@main
+        with:
+          core: true
+          cask: false
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up git
+        uses: Homebrew/actions/git-user-config@main
+
+      - name: Check formulas for updates
+        id: check
+        run: |
+          # Get list of formulas
+          FORMULAS=$(find Formula -name "*.rb" -exec basename {} \; | sed 's/\.rb$//')
+
+          echo "Checking formulas for updates..."
+          UPDATES=""
+
+          for FORMULA in $FORMULAS; do
+            echo "Checking $FORMULA..."
+            
+            # Check for latest version using livecheck
+            LIVECHECK_INFO=$(brew livecheck --formula "${{ github.repository_owner }}/tap/$FORMULA" --json 2>/dev/null || echo '[]')
+            CURRENT_VERSION=$(echo "$LIVECHECK_INFO" | jq -r '.[0].version.current // empty')
+            LATEST_VERSION=$(echo "$LIVECHECK_INFO" | jq -r '.[0].version.latest // empty')
+            
+            if [ -n "$LATEST_VERSION" ] && [ -n "$CURRENT_VERSION" ] && [ "$LATEST_VERSION" != "$CURRENT_VERSION" ]; then
+              echo "Update available for $FORMULA: $CURRENT_VERSION -> $LATEST_VERSION"
+              UPDATES="$UPDATES$FORMULA:$LATEST_VERSION "
+            else
+              echo "No update for $FORMULA (current: $CURRENT_VERSION)"
+            fi
+          done
+          
+          echo "updates=$UPDATES" >> "$GITHUB_OUTPUT"
+
+      - name: Create PRs for formula updates
+        if: steps.check.outputs.updates != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          UPDATES="${{ steps.check.outputs.updates }}"
+
+          for UPDATE in $UPDATES; do
+            FORMULA=$(echo "$UPDATE" | cut -d: -f1)
+            VERSION=$(echo "$UPDATE" | cut -d: -f2)
+
+            echo "Creating PR to update $FORMULA to $VERSION..."
+
+            # Use brew bump-formula-pr to create a PR
+            brew bump-formula-pr --no-browse --version="$VERSION" "${{ github.repository_owner }}/tap/$FORMULA" || {
+              echo "Failed to create PR for $FORMULA"
+              continue
+            }
+          done
+
+  # =============================================================================
+  # UPDATE CASKS - Check and bump cask versions
+  # =============================================================================
+  update-casks:
+    name: Update Casks
+    if: github.event.inputs.type != 'formulas'
+    runs-on: macos-latest
+    steps:
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@main
+        with:
+          core: false
+          cask: true
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up git
+        uses: Homebrew/actions/git-user-config@main
+
+      - name: Check casks for updates
+        id: check
+        run: |
+          # Get list of casks
+          CASKS=$(find Casks -name "*.rb" -exec basename {} \; | sed 's/\.rb$//')
+
+          echo "Checking casks for updates..."
+          UPDATES=""
+
+          for CASK in $CASKS; do
+            echo "Checking $CASK..."
+            
+            # Check for latest version using livecheck
+            LIVECHECK_INFO=$(brew livecheck --cask "${{ github.repository_owner }}/tap/$CASK" --json 2>/dev/null || echo '[]')
+            CURRENT_VERSION=$(echo "$LIVECHECK_INFO" | jq -r '.[0].version.current // empty')
+            LATEST_VERSION=$(echo "$LIVECHECK_INFO" | jq -r '.[0].version.latest // empty')
+            
+            if [ -n "$LATEST_VERSION" ] && [ -n "$CURRENT_VERSION" ] && [ "$LATEST_VERSION" != "$CURRENT_VERSION" ]; then
+              echo "Update available for $CASK: $CURRENT_VERSION -> $LATEST_VERSION"
+              UPDATES="$UPDATES$CASK:$LATEST_VERSION "
+            else
+              echo "No update for $CASK (current: $CURRENT_VERSION)"
+            fi
+          done
+          
+          echo "updates=$UPDATES" >> "$GITHUB_OUTPUT"
+
+      - name: Update casks
+        if: steps.check.outputs.updates != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          UPDATES="${{ steps.check.outputs.updates }}"
+          FAILED_UPDATES=""
+
+          for UPDATE in $UPDATES; do
+            CASK=$(echo "$UPDATE" | cut -d: -f1)
+            VERSION=$(echo "$UPDATE" | cut -d: -f2)
+
+            echo "Updating $CASK to $VERSION..."
+
+            # Update the cask using brew bump-cask-pr
+            if ! brew bump-cask-pr --write-only --version="$VERSION" "${{ github.repository_owner }}/tap/$CASK"; then
+              echo "Failed to update $CASK to $VERSION"
+              FAILED_UPDATES="$FAILED_UPDATES $CASK"
+              continue
+            fi
+
+            # Commit and push directly to main (casks don't need bottles)
+            git add "Casks/$CASK.rb"
+            git commit -m "$CASK $VERSION"
+            git push origin main
+
+            echo "Successfully updated $CASK to $VERSION"
+          done
+
+          # Report failures but don't fail the workflow
+          if [ -n "$FAILED_UPDATES" ]; then
+            echo "::warning::The following casks failed to update:$FAILED_UPDATES"
+          fi

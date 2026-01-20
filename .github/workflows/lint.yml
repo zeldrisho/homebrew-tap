@@ -1,0 +1,104 @@
+name: Lint
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+env:
+  HOMEBREW_DEVELOPER: 1
+  HOMEBREW_NO_AUTO_UPDATE: 1
+  HOMEBREW_NO_ENV_HINTS: 1
+
+concurrency:
+  group: "lint-${{ github.ref }}"
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  # =============================================================================
+  # STYLE CHECK - Ruby style and Homebrew conventions
+  # =============================================================================
+  style:
+    name: Style Check
+    runs-on: macos-latest
+    steps:
+      - name: Set up Homebrew
+        id: set-up-homebrew
+        uses: Homebrew/actions/setup-homebrew@main
+        with:
+          core: true
+          cask: true
+
+      - name: Cache Homebrew Bundler RubyGems
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.set-up-homebrew.outputs.gems-path }}
+          key: ${{ runner.os }}-rubygems-${{ steps.set-up-homebrew.outputs.gems-hash }}
+          restore-keys: ${{ runner.os }}-rubygems-
+
+      - name: Cache style cache
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Caches/Homebrew/style
+          key: macos-style-cache-${{ github.sha }}
+          restore-keys: macos-style-cache-
+
+      - name: Install Homebrew Bundler RubyGems
+        run: brew install-bundler-gems
+
+      - name: Run brew style on tap
+        run: brew style "$GITHUB_REPOSITORY"
+
+  # =============================================================================
+  # FORMULA AUDIT - Audit formulas for issues
+  # =============================================================================
+  audit-formulas:
+    name: Audit Formulas
+    runs-on: macos-latest
+    steps:
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@main
+        with:
+          core: true
+          cask: false
+
+      - name: Run brew audit on formulas
+        run: |
+          brew audit --tap="$GITHUB_REPOSITORY" --formula --except=version
+
+  # =============================================================================
+  # CASK AUDIT - Audit casks for issues
+  # =============================================================================
+  audit-casks:
+    name: Audit Casks
+    runs-on: macos-latest
+    steps:
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@main
+        with:
+          core: false
+          cask: true
+
+      - name: Run brew audit on casks
+        run: |
+          brew audit --tap="$GITHUB_REPOSITORY" --cask --except=version
+
+  # =============================================================================
+  # ACTIONLINT - Lint GitHub Actions workflows
+  # =============================================================================
+  actionlint:
+    name: Actionlint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run actionlint
+        uses: reviewdog/action-actionlint@v1
+        with:
+          reporter: github-pr-review
+          fail_level: error

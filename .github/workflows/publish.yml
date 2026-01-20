@@ -1,32 +1,40 @@
-name: brew pr-pull
+name: Publish
 
 on:
   pull_request_target:
     types:
       - labeled
 
+env:
+  HOMEBREW_DEVELOPER: 1
+  HOMEBREW_NO_AUTO_UPDATE: 1
+  HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
 jobs:
+  # =============================================================================
+  # PR-PULL - Pull bottles and merge PR (for formulas with bottles)
+  # =============================================================================
   pr-pull:
+    name: Pull Request Pull
     if: contains(github.event.pull_request.labels.*.name, 'pr-pull')
     runs-on: macos-latest
-    permissions:
-      actions: read
-      checks: read
-      contents: write
-      issues: read
-      pull-requests: write
     steps:
       - name: Set up Homebrew
         uses: Homebrew/actions/setup-homebrew@main
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          core: true
+          cask: true
 
       - name: Set up git
         uses: Homebrew/actions/git-user-config@main
 
       - name: Pull bottles
         env:
-          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PULL_REQUEST: ${{ github.event.pull_request.number }}
         run: brew pr-pull --debug --tap="$GITHUB_REPOSITORY" "$PULL_REQUEST"
 
@@ -40,3 +48,49 @@ jobs:
         env:
           BRANCH: ${{ github.event.pull_request.head.ref }}
         run: git push --delete origin "$BRANCH"
+
+  # =============================================================================
+  # AUTOMERGE-CASK - Auto-merge cask-only PRs (no bottles needed)
+  # =============================================================================
+  automerge-cask:
+    name: Auto-merge Cask PR
+    if: contains(github.event.pull_request.labels.*.name, 'automerge-cask')
+    runs-on: macos-latest
+    steps:
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@main
+        with:
+          core: false
+          cask: true
+
+      - name: Set up git
+        uses: Homebrew/actions/git-user-config@main
+
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Verify cask-only changes
+        id: check-changes
+        run: |
+          # Get changed files
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          
+          # Check if any non-cask files were changed
+          NON_CASK_CHANGES=$(echo "$CHANGED_FILES" | grep -v '^Casks/' | grep -v '^\.github/' || true)
+          
+          if [ -n "$NON_CASK_CHANGES" ]; then
+            echo "::error::This PR contains non-cask changes. Use 'pr-pull' label instead."
+            echo "Non-cask files changed: $NON_CASK_CHANGES"
+            exit 1
+          fi
+          
+          echo "Only cask files changed. Safe to auto-merge."
+
+      - name: Merge PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr merge ${{ github.event.pull_request.number }} --squash --delete-branch
