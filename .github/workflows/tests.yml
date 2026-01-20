@@ -110,23 +110,25 @@ jobs:
           fi
           
           # Summary
-          echo "### 📦 Detected Changes" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          if [ -n "$NEW_FORMULAS" ]; then
-            echo "**New Formulas:** $NEW_FORMULAS" >> "$GITHUB_STEP_SUMMARY"
-          fi
-          if [ -n "$MODIFIED_FORMULAS" ]; then
-            echo "**Modified Formulas:** $MODIFIED_FORMULAS" >> "$GITHUB_STEP_SUMMARY"
-          fi
-          if [ -n "$NEW_CASKS" ]; then
-            echo "**New Casks:** $NEW_CASKS" >> "$GITHUB_STEP_SUMMARY"
-          fi
-          if [ -n "$MODIFIED_CASKS" ]; then
-            echo "**Modified Casks:** $MODIFIED_CASKS" >> "$GITHUB_STEP_SUMMARY"
-          fi
-          if [ -z "$ALL_FORMULAS" ] && [ -z "$ALL_CASKS" ]; then
-            echo "No formula or cask changes detected." >> "$GITHUB_STEP_SUMMARY"
-          fi
+          {
+            echo "### 📦 Detected Changes"
+            echo ""
+            if [ -n "$NEW_FORMULAS" ]; then
+              echo "**New Formulas:** $NEW_FORMULAS"
+            fi
+            if [ -n "$MODIFIED_FORMULAS" ]; then
+              echo "**Modified Formulas:** $MODIFIED_FORMULAS"
+            fi
+            if [ -n "$NEW_CASKS" ]; then
+              echo "**New Casks:** $NEW_CASKS"
+            fi
+            if [ -n "$MODIFIED_CASKS" ]; then
+              echo "**Modified Casks:** $MODIFIED_CASKS"
+            fi
+            if [ -z "$ALL_FORMULAS" ] && [ -z "$ALL_CASKS" ]; then
+              echo "No formula or cask changes detected."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
 
   # =============================================================================
   # FORMULA TESTING - Test formulas with brew test-bot
