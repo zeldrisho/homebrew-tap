@@ -3,12 +3,9 @@ cask "coccoc" do
   sha256 :no_check
 
   url "https://files1.coccoc.com/browser/mac/coccoc.dmg"
-
   name "Cốc Cốc"
   desc "Vietnamese Chromium-based web browser"
   homepage "https://coccoc.com/"
-
-  no_autobump_defined
 
   livecheck do
     url :url
