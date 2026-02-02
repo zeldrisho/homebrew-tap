@@ -104,13 +104,15 @@ jobs:
           fi
           
           # Set outputs
-          echo "formulas=${ALL_FORMULAS}" >> "$GITHUB_OUTPUT"
-          echo "new_formulas=${NEW_FORMULAS}" >> "$GITHUB_OUTPUT"
-          echo "modified_formulas=${MODIFIED_FORMULAS}" >> "$GITHUB_OUTPUT"
-          echo "casks=${ALL_CASKS}" >> "$GITHUB_OUTPUT"
-          echo "new_casks=${NEW_CASKS}" >> "$GITHUB_OUTPUT"
-          echo "modified_casks=${MODIFIED_CASKS}" >> "$GITHUB_OUTPUT"
-          echo "formula_supports_linux=${SUPPORTS_LINUX}" >> "$GITHUB_OUTPUT"
+          {
+            echo "formulas=${ALL_FORMULAS}"
+            echo "new_formulas=${NEW_FORMULAS}"
+            echo "modified_formulas=${MODIFIED_FORMULAS}"
+            echo "casks=${ALL_CASKS}"
+            echo "new_casks=${NEW_CASKS}"
+            echo "modified_casks=${MODIFIED_CASKS}"
+            echo "formula_supports_linux=${SUPPORTS_LINUX}"
+          } >> "$GITHUB_OUTPUT"
           
           # Set flags
           if [ -n "$ALL_FORMULAS" ]; then
@@ -392,8 +394,10 @@ jobs:
     steps:
       - name: Check job results
         run: |
-          echo "### 🧪 Test Results" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo "### 🧪 Test Results"
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
           
           # Tap syntax is always required
           if [[ "${{ needs.tap-syntax.result }}" == "failure" ]]; then
