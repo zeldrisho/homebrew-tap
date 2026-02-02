@@ -28,6 +28,7 @@ brew install <formula>
 
 |Name|Description|
 |----|-----------|
+|[coccoc](https://github.com/zeldrisho/homebrew-tap/blob/main/Casks/coccoc.rb)|Vietnamese Chromium-based web browser|
 |[kdeconnect](https://github.com/zeldrisho/homebrew-tap/blob/main/Casks/kdeconnect.rb)|Enabling communication between all your devices|
 
 ## Formulae
