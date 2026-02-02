@@ -17,7 +17,7 @@ class Smapi < Formula
 
     cd "internal/#{platform_folder}" do
       system "unzip", "-q", "install.dat"
-      
+
       libexec.install Dir["bundle/smapi-internal/*"]
       bin.install "bundle/unix-launcher.sh" => "smapi"
       chmod 0755, bin/"smapi"
@@ -26,12 +26,12 @@ class Smapi < Formula
 
     (bin/"StardewModdingAPI").write_env_script(
       libexec/"StardewModdingAPI",
-      DOTNET_ROOT: Formula["dotnet@6"].opt_libexec
+      DOTNET_ROOT: Formula["dotnet@6"].opt_libexec,
     )
   end
 
   test do
-    assert_predicate libexec/"StardewModdingAPI", :exist?
-    assert_predicate libexec/"StardewModdingAPI.dll", :exist?
+    assert_path_exists libexec/"StardewModdingAPI"
+    assert_path_exists libexec/"StardewModdingAPI.dll"
   end
 end
