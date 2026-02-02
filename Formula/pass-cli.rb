@@ -4,6 +4,26 @@ class PassCli < Formula
   version "1.4.1"
   license "GPL-3.0"
 
+  on_linux do
+    on_intel do
+      url "https://proton.me/download/pass-cli/1.4.1/pass-cli-linux-x86_64"
+      sha256 "0c642cdf84186ce5084995b71029c0fbb7795428232beab8d8741937fdb7264b"
+
+      define_method :install do
+        bin.install "pass-cli-linux-x86_64" => "pass-cli"
+      end
+    end
+
+    on_arm do
+      url "https://proton.me/download/pass-cli/1.4.1/pass-cli-linux-aarch64"
+      sha256 "28f4ab25b0ea215c95e87d4d57c2499fe809aca6e9545104ec08995973aa83ad"
+
+      define_method :install do
+        bin.install "pass-cli-linux-aarch64" => "pass-cli"
+      end
+    end
+  end
+
   on_macos do
     on_intel do
       url "https://proton.me/download/pass-cli/1.4.1/pass-cli-macos-x86_64"
