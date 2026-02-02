@@ -20,7 +20,9 @@ permissions:
 
 jobs:
   # =============================================================================
-  # STYLE CHECK - Ruby style and Homebrew conventions
+  # STYLE CHECK - Ruby style and Homebrew conventions (quick linting)
+  # Note: This is a fast syntax/style check. Full tests with brew test-bot
+  # are run in tests.yml workflow.
   # =============================================================================
   style:
     name: Style Check
@@ -54,7 +56,8 @@ jobs:
         run: brew style "$GITHUB_REPOSITORY"
 
   # =============================================================================
-  # FORMULA AUDIT - Audit formulas for issues
+  # FORMULA AUDIT - Basic audit for quick feedback (no online checks)
+  # Note: Full strict online audits are performed in tests.yml workflow
   # =============================================================================
   audit-formulas:
     name: Audit Formulas
@@ -71,7 +74,8 @@ jobs:
           brew audit --tap="$GITHUB_REPOSITORY" --formula --except=version
 
   # =============================================================================
-  # CASK AUDIT - Audit casks for issues
+  # CASK AUDIT - Basic audit for quick feedback (no online checks)
+  # Note: Full strict online audits are performed in tests.yml workflow
   # =============================================================================
   audit-casks:
     name: Audit Casks
@@ -86,19 +90,3 @@ jobs:
       - name: Run brew audit on casks
         run: |
           brew audit --tap="$GITHUB_REPOSITORY" --cask --except=version
-
-  # =============================================================================
-  # ACTIONLINT - Lint GitHub Actions workflows
-  # =============================================================================
-  actionlint:
-    name: Actionlint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Run actionlint
-        uses: reviewdog/action-actionlint@v1
-        with:
-          reporter: github-pr-review
-          fail_level: error

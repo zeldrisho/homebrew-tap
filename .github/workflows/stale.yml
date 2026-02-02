@@ -1,0 +1,85 @@
+name: Manage Stale Issues and PRs
+
+on:
+  push:
+    paths:
+      - .github/workflows/stale.yml
+    branches-ignore:
+      - dependabot/**
+  schedule:
+    # Once every day at midnight UTC
+    - cron: "0 0 * * *"
+  issue_comment:
+
+permissions: {}
+
+defaults:
+  run:
+    shell: bash -xeuo pipefail {0}
+
+concurrency:
+  group: stale
+  cancel-in-progress: ${{ github.event_name != 'issue_comment' }}
+
+jobs:
+  # =============================================================================
+  # STALE MANAGEMENT - Mark and close inactive issues/PRs
+  # =============================================================================
+  stale:
+    name: Mark/Close Stale Items
+    if: >
+      github.event_name != 'issue_comment' || (
+        contains(github.event.issue.labels.*.name, 'stale') ||
+        contains(github.event.pull_request.labels.*.name, 'stale')
+      )
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Mark/Close Stale Issues and Pull Requests
+        uses: actions/stale@v9
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          days-before-stale: 30
+          days-before-close: 7
+          stale-issue-message: >
+            This issue has been automatically marked as stale because it has not had
+            recent activity. It will be closed if no further activity occurs.
+          stale-pr-message: >
+            This pull request has been automatically marked as stale because it has not had
+            recent activity. It will be closed if no further activity occurs.
+          exempt-issue-labels: "help wanted,in progress,pinned"
+          exempt-pr-labels: "help wanted,in progress,pinned"
+          delete-branch: true
+
+  # =============================================================================
+  # BUMP PR STALE - Faster stale handling for automated bump PRs
+  # =============================================================================
+  bump-pr-stale:
+    name: Mark/Close Stale Bump PRs
+    if: >
+      github.event_name != 'issue_comment' || (
+        contains(github.event.issue.labels.*.name, 'stale') ||
+        contains(github.event.pull_request.labels.*.name, 'stale')
+      )
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Mark/Close Stale Bump PRs
+        uses: actions/stale@v9
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          days-before-stale: 3
+          days-before-close: 2
+          stale-pr-message: >
+            This automated bump PR has been marked as stale due to inactivity.
+            It will be closed soon if no further activity occurs. To keep this
+            pull request open, add a `help wanted` or `in progress` label.
+          exempt-pr-labels: "help wanted,in progress,pinned"
+          any-of-labels: "autobump,bump-formula-pr,bump-cask-pr"
+          delete-branch: true

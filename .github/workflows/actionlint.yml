@@ -1,0 +1,93 @@
+name: Actionlint
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+defaults:
+  run:
+    shell: bash -xeuo pipefail {0}
+
+concurrency:
+  group: "actionlint-${{ github.ref }}"
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  HOMEBREW_DEVELOPER: 1
+  HOMEBREW_NO_AUTO_UPDATE: 1
+  HOMEBREW_NO_ENV_HINTS: 1
+
+permissions:
+  contents: read
+
+jobs:
+  workflow_syntax:
+    name: Workflow Syntax & Security
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    container:
+      image: ghcr.io/homebrew/ubuntu22.04:main
+    steps:
+      - name: Set up Homebrew
+        id: setup-homebrew
+        uses: Homebrew/actions/setup-homebrew@main
+        with:
+          core: false
+          cask: false
+
+      - name: Install tools
+        run: brew install actionlint shellcheck zizmor
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Run zizmor security scan
+        run: zizmor --format sarif . > results.sarif
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload SARIF file
+        uses: actions/upload-artifact@v4
+        if: always() && github.event_name != 'merge_group'
+        with:
+          name: results.sarif
+          path: results.sarif
+
+      - name: Set up actionlint matcher
+        run: |
+          # Make actionlint matcher accessible
+          cp "$(brew --repository)/.github/actionlint-matcher.json" "$HOME"
+          echo "::add-matcher::$HOME/actionlint-matcher.json"
+
+      - name: Run actionlint
+        run: actionlint
+
+  upload_sarif:
+    name: Upload Security Results
+    needs: workflow_syntax
+    if: >
+      always() &&
+      !contains(fromJSON('["cancelled", "skipped"]'), needs.workflow_syntax.result) &&
+      !github.event.repository.private &&
+      github.event_name != 'merge_group'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Download SARIF file
+        uses: actions/download-artifact@v4
+        with:
+          name: results.sarif
+          path: results.sarif
+
+      - name: Upload SARIF to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: results.sarif
+          category: zizmor

@@ -1,0 +1,220 @@
+name: Scheduled Health Checks
+
+on:
+  push:
+    paths:
+      - .github/workflows/scheduled.yml
+  schedule:
+    # Once per week on Monday at 2 AM UTC
+    - cron: "0 2 * * 1"
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash -xeuo pipefail {0}
+
+concurrency:
+  group: scheduled
+  cancel-in-progress: true
+
+permissions: {}
+
+env:
+  HOMEBREW_DEVELOPER: 1
+  HOMEBREW_NO_AUTO_UPDATE: 1
+  HOMEBREW_NO_ENV_HINTS: 1
+
+jobs:
+  # =============================================================================
+  # FORMULA HEALTH CHECK - Test random formulas to ensure they still work
+  # =============================================================================
+  formula-health-check:
+    name: Formula Health Check
+    runs-on: macos-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@main
+        with:
+          core: true
+          cask: false
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Test formulas
+        id: test
+        run: |
+          echo "### Formula Health Check Results" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          
+          FAILED_FORMULAS=""
+          
+          # Get all formulas
+          FORMULAS=$(find Formula -name "*.rb" -exec basename {} .rb \;)
+          
+          for FORMULA in $FORMULAS; do
+            echo "::group::Testing $FORMULA"
+            
+            # Audit formula
+            if ! brew audit --formula --online "${{ github.repository_owner }}/tap/$FORMULA" 2>&1; then
+              echo "⚠️ Audit issues found for $FORMULA" >> "$GITHUB_STEP_SUMMARY"
+              FAILED_FORMULAS="$FAILED_FORMULAS $FORMULA"
+            fi
+            
+            # Test fetching (don't install to save time)
+            if ! brew fetch --retry "${{ github.repository_owner }}/tap/$FORMULA" 2>&1; then
+              echo "❌ Failed to fetch $FORMULA" >> "$GITHUB_STEP_SUMMARY"
+              FAILED_FORMULAS="$FAILED_FORMULAS $FORMULA"
+            else
+              echo "✅ $FORMULA - OK" >> "$GITHUB_STEP_SUMMARY"
+            fi
+            
+            echo "::endgroup::"
+          done
+          
+          if [ -n "$FAILED_FORMULAS" ]; then
+            echo "failed_formulas=$FAILED_FORMULAS" >> "$GITHUB_OUTPUT"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "**Failed formulas:**$FAILED_FORMULAS" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "failed_formulas=" >> "$GITHUB_OUTPUT"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "**All formulas passed health check!** ✨" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Create issue for failures
+        if: steps.test.outputs.failed_formulas != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          FORMULAS="${{ steps.test.outputs.failed_formulas }}"
+          DATE=$(date -u +"%Y-%m-%d")
+          
+          # Check if there's already an open issue for health check failures
+          EXISTING_ISSUE=$(gh issue list --label "health-check" --state open --limit 1 --json number --jq '.[0].number' || echo "")
+          
+          # Create issue body
+          ISSUE_BODY="## Formula Health Check Failed - ${DATE}
+
+          The following formulas failed the scheduled health check:
+
+          ${FORMULAS}
+
+          ### Actions Needed
+          - Check if upstream sources are still available
+          - Verify if formulas need version updates
+          - Test installation manually if needed
+
+          ---
+          *This issue was automatically created by the scheduled health check workflow.*"
+          
+          if [ -n "$EXISTING_ISSUE" ]; then
+            echo "Updating existing issue #$EXISTING_ISSUE"
+            gh issue comment "$EXISTING_ISSUE" --body "$ISSUE_BODY"
+          else
+            echo "Creating new issue"
+            gh issue create \
+              --title "Formula Health Check Failed - $DATE" \
+              --body "$ISSUE_BODY" \
+              --label "health-check,bug"
+          fi
+
+  # =============================================================================
+  # CASK HEALTH CHECK - Verify casks are still downloadable
+  # =============================================================================
+  cask-health-check:
+    name: Cask Health Check
+    runs-on: macos-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@main
+        with:
+          core: false
+          cask: true
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Test casks
+        id: test
+        run: |
+          echo "### Cask Health Check Results" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          
+          FAILED_CASKS=""
+          
+          # Get all casks
+          CASKS=$(find Casks -name "*.rb" -exec basename {} .rb \;)
+          
+          for CASK in $CASKS; do
+            echo "::group::Testing $CASK"
+            
+            # Audit cask
+            if ! brew audit --cask --online "${{ github.repository_owner }}/tap/$CASK" 2>&1; then
+              echo "⚠️ Audit issues found for $CASK" >> "$GITHUB_STEP_SUMMARY"
+              FAILED_CASKS="$FAILED_CASKS $CASK"
+            fi
+            
+            # Test fetching
+            if ! brew fetch --cask --retry "${{ github.repository_owner }}/tap/$CASK" 2>&1; then
+              echo "❌ Failed to fetch $CASK" >> "$GITHUB_STEP_SUMMARY"
+              FAILED_CASKS="$FAILED_CASKS $CASK"
+            else
+              echo "✅ $CASK - OK" >> "$GITHUB_STEP_SUMMARY"
+            fi
+            
+            echo "::endgroup::"
+          done
+          
+          if [ -n "$FAILED_CASKS" ]; then
+            echo "failed_casks=$FAILED_CASKS" >> "$GITHUB_OUTPUT"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "**Failed casks:**$FAILED_CASKS" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "failed_casks=" >> "$GITHUB_OUTPUT"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "**All casks passed health check!** ✨" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Create issue for failures
+        if: steps.test.outputs.failed_casks != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          CASKS="${{ steps.test.outputs.failed_casks }}"
+          DATE=$(date -u +"%Y-%m-%d")
+          
+          # Check if there's already an open issue for health check failures
+          EXISTING_ISSUE=$(gh issue list --label "health-check" --state open --limit 1 --json number --jq '.[0].number' || echo "")
+          
+          # Create issue body
+          ISSUE_BODY="## Cask Health Check Failed - ${DATE}
+
+          The following casks failed the scheduled health check:
+
+          ${CASKS}
+
+          ### Actions Needed
+          - Check if download URLs are still valid
+          - Verify if casks need version updates
+          - Test installation manually if needed
+
+          ---
+          *This issue was automatically created by the scheduled health check workflow.*"
+          
+          if [ -n "$EXISTING_ISSUE" ]; then
+            echo "Updating existing issue #$EXISTING_ISSUE"
+            gh issue comment "$EXISTING_ISSUE" --body "$ISSUE_BODY"
+          else
+            echo "Creating new issue"
+            gh issue create \
+              --title "Cask Health Check Failed - $DATE" \
+              --body "$ISSUE_BODY" \
+              --label "health-check,bug"
+          fi
