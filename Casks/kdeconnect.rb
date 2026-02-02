@@ -1,7 +1,6 @@
 cask "kdeconnect" do
   arch arm: "arm64", intel: "x86_64"
 
-  # TODO: eventually also handle release versions (e.g. release-24.08 etc.)?
   base_url = "https://cdn.kde.org/ci-builds/network/kdeconnect-kde/master/macos-#{arch}"
 
   version "5841"
@@ -15,7 +14,7 @@ cask "kdeconnect" do
 
   livecheck do
     url base_url
-    regex(/href=.*?kdeconnect-kde-master-(\d+(?:)+)-macos-clang-#{arch}\.dmg/i)
+    regex(/href=.*?kdeconnect-kde-master-(\d+)-macos-clang-#{arch}\.dmg/i)
   end
 
   depends_on macos: ">= :ventura"

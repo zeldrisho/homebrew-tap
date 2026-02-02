@@ -6,56 +6,30 @@ class PassCli < Formula
 
   on_macos do
     on_intel do
-      url "https://proton.me/download/pass-cli/1.4.1/pass-cli-macos-x86_64"
+      url "https://proton.me/download/pass-cli/#{version}/pass-cli-macos-x86_64"
       sha256 "ceffa547d14af8ea5acf0963f11ef0d60ee0bd37fd7ed34a4c70ef86d82ad035"
-
-      define_method :install do
-        bin.install "pass-cli-macos-x86_64" => "pass-cli"
-      end
     end
 
     on_arm do
-      url "https://proton.me/download/pass-cli/1.4.1/pass-cli-macos-aarch64"
+      url "https://proton.me/download/pass-cli/#{version}/pass-cli-macos-aarch64"
       sha256 "7019050f490d8289c045eca39a6abf3fd480f6bcc3fa7807831241b4ec13d7f1"
-
-      define_method :install do
-        bin.install "pass-cli-macos-aarch64" => "pass-cli"
-      end
     end
   end
 
   on_linux do
     on_intel do
-      url "https://proton.me/download/pass-cli/1.4.1/pass-cli-linux-x86_64"
+      url "https://proton.me/download/pass-cli/#{version}/pass-cli-linux-x86_64"
       sha256 "0c642cdf84186ce5084995b71029c0fbb7795428232beab8d8741937fdb7264b"
-
-      define_method :install do
-        bin.install "pass-cli-linux-x86_64" => "pass-cli"
-      end
     end
 
     on_arm do
-      url "https://proton.me/download/pass-cli/1.4.1/pass-cli-linux-aarch64"
+      url "https://proton.me/download/pass-cli/#{version}/pass-cli-linux-aarch64"
       sha256 "28f4ab25b0ea215c95e87d4d57c2499fe809aca6e9545104ec08995973aa83ad"
-
-      define_method :install do
-        bin.install "pass-cli-linux-aarch64" => "pass-cli"
-      end
     end
   end
 
-  def caveats
-    <<~EOS
-      The Proton Pass CLI has been installed as 'pass-cli'.
-
-      To get started:
-        pass-cli login
-
-      For help:
-        pass-cli --help
-
-      Documentation: https://protonpass.github.io/pass-cli/
-    EOS
+  def install
+    bin.install Dir["pass-cli-*"].first => "pass-cli"
   end
 
   test do
