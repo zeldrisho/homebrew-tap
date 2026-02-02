@@ -9,7 +9,7 @@ class PassCli < Formula
       url "https://proton.me/download/pass-cli/1.4.1/pass-cli-macos-x86_64"
       sha256 "ceffa547d14af8ea5acf0963f11ef0d60ee0bd37fd7ed34a4c70ef86d82ad035"
 
-      def install
+      define_method :install do
         bin.install "pass-cli-macos-x86_64" => "pass-cli"
       end
     end
@@ -18,7 +18,7 @@ class PassCli < Formula
       url "https://proton.me/download/pass-cli/1.4.1/pass-cli-macos-aarch64"
       sha256 "7019050f490d8289c045eca39a6abf3fd480f6bcc3fa7807831241b4ec13d7f1"
 
-      def install
+      define_method :install do
         bin.install "pass-cli-macos-aarch64" => "pass-cli"
       end
     end
