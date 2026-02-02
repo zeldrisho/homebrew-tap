@@ -1,8 +1,8 @@
 cask "coccoc" do
-  version "143.0.7499.182"
-  sha256 "81a571e1401ee94dc3004abc19b683c64836b29eb3e997c4b39fae75d5f26445"
+  version :latest
 
   url "https://files1.coccoc.com/browser/mac/coccoc.dmg"
+  sha256 :no_check
   name "Cốc Cốc"
   desc "Vietnamese Chromium-based web browser"
   homepage "https://coccoc.com/"
