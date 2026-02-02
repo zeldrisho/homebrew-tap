@@ -7,11 +7,6 @@ cask "coccoc" do
   desc "Vietnamese Chromium-based web browser"
   homepage "https://coccoc.com/"
 
-  livecheck do
-    url :url
-    strategy :extract_plist
-  end
-
   app "CocCoc.app"
 
   uninstall launchctl: "com.coccoc.CocCoc"
