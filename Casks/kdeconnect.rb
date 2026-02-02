@@ -3,9 +3,9 @@ cask "kdeconnect" do
 
   base_url = "https://cdn.kde.org/ci-builds/network/kdeconnect-kde/master/macos-#{arch}"
 
-  version "5841"
-  sha256 arm:   "3293b9010cfe18f6106b19a7e082a9e1d7ad51bf20286ab7bdaa4b57651f1fba",
-         intel: "1e0be05d1567061e0456ef273d234bab8c55f115cccf987523bd1a6c7bd8f22e"
+  version "5850"
+  sha256 arm:   "52d8cc8a04905ffb1a5c35ec3173c269f02c53be90b0b16ebff78bd495e647c8",
+         intel: "833ac3bfda3e9320bc825e91cf49c6f13e0b62d77a56449459ae63806b0c38fc"
 
   url "#{base_url}/kdeconnect-kde-master-#{version}-macos-clang-#{arch}.dmg"
   name "KDE Connect"
