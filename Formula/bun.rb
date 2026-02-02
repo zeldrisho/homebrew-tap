@@ -1,11 +1,11 @@
 class Bun < Formula
-  desc "Incredibly fast JavaScript runtime, bundler, transpiler and package manager - all in one"
+  desc "Fast JavaScript runtime, bundler, transpiler and package manager"
   homepage "https://bun.sh/"
-  license "MIT"
   version "1.3.8"
+  license "MIT"
 
   livecheck do
-    url "https://github.com/oven-sh/bun/releases/latest"
+    url :stable
     regex(%r{href=.*?/tag/bun-v?(\d+(?:\.\d+)+)["' >]}i)
   end
 
@@ -38,11 +38,11 @@ class Bun < Formula
   # TODO: to become an official formula we need to build from source
   def install
     bin.install "bun"
-    ENV["BUN_INSTALL"] = "#{bin}"
+    ENV["BUN_INSTALL"] = bin.to_s
     generate_completions_from_executable(bin/"bun", "completions")
   end
 
-  def test
-    assert_match "#{version}", shell_output("#{bin}/bun -v")
+  test do
+    assert_match version.to_s, shell_output("#{bin}/bun -v")
   end
 end

@@ -34,4 +34,4 @@ brew install <formula>
 
 |Name|Description|
 |----|-----------|
-|[bun](https://github.com/zeldrisho/homebrew-tap/blob/main/Casks/bun.rb)|Incredibly fast JavaScript runtime, bundler, transpiler and package manager - all in one|
+|[bun](https://github.com/zeldrisho/homebrew-tap/blob/main/Casks/bun.rb)|Fast JavaScript runtime, bundler, transpiler and package manager|
