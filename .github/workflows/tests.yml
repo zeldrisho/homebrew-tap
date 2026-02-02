@@ -50,7 +50,7 @@ jobs:
         run: brew test-bot --only-tap-syntax
 
   # =============================================================================
-  # DETECT CHANGES - Identify new and modified formulas/casks
+  # DETECT CHANGES - Identify new and modified formulas/casks and detect OS support
   # =============================================================================
   detect-changes:
     name: Detect Changes
@@ -65,6 +65,7 @@ jobs:
       modified_casks: ${{ steps.detect.outputs.modified_casks }}
       has_formula_changes: ${{ steps.detect.outputs.has_formula_changes }}
       has_cask_changes: ${{ steps.detect.outputs.has_cask_changes }}
+      formula_supports_linux: ${{ steps.detect.outputs.formula_supports_linux }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -88,6 +89,20 @@ jobs:
           MODIFIED_CASKS=$(echo "$MODIFIED_FILES" | grep '^Casks/.*\.rb$' | xargs -I {} basename {} .rb | tr '\n' ' ' | xargs)
           ALL_CASKS="$NEW_CASKS $MODIFIED_CASKS"
           
+          # Check if formulas support Linux by analyzing the .rb files
+          SUPPORTS_LINUX="false"
+          if [ -n "$ALL_FORMULAS" ]; then
+            for formula in $ALL_FORMULAS; do
+              if [ -f "Formula/${formula}.rb" ]; then
+                # Check if formula has Linux-specific content (OS.linux?, x86_64_linux, arm64_linux, etc.)
+                if grep -qE '(OS\.linux|x86_64_linux|arm64_linux|on_linux)' "Formula/${formula}.rb"; then
+                  SUPPORTS_LINUX="true"
+                  break
+                fi
+              fi
+            done
+          fi
+          
           # Set outputs
           echo "formulas=${ALL_FORMULAS}" >> "$GITHUB_OUTPUT"
           echo "new_formulas=${NEW_FORMULAS}" >> "$GITHUB_OUTPUT"
@@ -95,6 +110,7 @@ jobs:
           echo "casks=${ALL_CASKS}" >> "$GITHUB_OUTPUT"
           echo "new_casks=${NEW_CASKS}" >> "$GITHUB_OUTPUT"
           echo "modified_casks=${MODIFIED_CASKS}" >> "$GITHUB_OUTPUT"
+          echo "formula_supports_linux=${SUPPORTS_LINUX}" >> "$GITHUB_OUTPUT"
           
           # Set flags
           if [ -n "$ALL_FORMULAS" ]; then
@@ -197,6 +213,54 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: bottles_${{ matrix.os }}
+          path: '*.bottle.*'
+
+  # =============================================================================
+  # FORMULA TESTING (LINUX) - Test formulas on Linux (only if they support it)
+  # =============================================================================
+  test-formulas-linux:
+    name: Test Formulas (Ubuntu)
+    needs: [tap-syntax, detect-changes]
+    if: |
+      github.event_name == 'pull_request' && 
+      needs.detect-changes.outputs.has_formula_changes == 'true' &&
+      needs.detect-changes.outputs.formula_supports_linux == 'true'
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/homebrew/ubuntu22.04:main
+    permissions:
+      actions: read
+      checks: read
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Set up Homebrew
+        id: set-up-homebrew
+        uses: Homebrew/actions/setup-homebrew@main
+        with:
+          core: true
+          cask: false
+
+      - name: Cache Homebrew Bundler RubyGems
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.set-up-homebrew.outputs.gems-path }}
+          key: ubuntu-latest-rubygems-${{ steps.set-up-homebrew.outputs.gems-hash }}
+          restore-keys: ubuntu-latest-rubygems-
+
+      - name: Clean up before testing
+        run: brew test-bot --only-cleanup-before
+
+      - name: Test formulas on Linux
+        run: brew test-bot --only-formulae --skip-online-checks
+        env:
+          HOMEBREW_GITHUB_API_TOKEN: ${{ github.token }}
+
+      - name: Upload bottles as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bottles_ubuntu-latest
           path: '*.bottle.*'
 
   # =============================================================================
@@ -322,7 +386,7 @@ jobs:
   # =============================================================================
   conclusion:
     name: Conclusion
-    needs: [tap-syntax, detect-changes, test-formulas, test-casks]
+    needs: [tap-syntax, detect-changes, test-formulas, test-formulas-linux, test-casks]
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -342,19 +406,34 @@ jobs:
             echo "⏭️ **Tap Syntax**: ${{ needs.tap-syntax.result }}" >> "$GITHUB_STEP_SUMMARY"
           fi
           
-          # Formula tests (only fail if there were formula changes and tests failed)
+          # Formula tests on macOS (only fail if there were formula changes and tests failed)
           if [[ "${{ needs.detect-changes.outputs.has_formula_changes }}" == "true" ]]; then
             if [[ "${{ needs.test-formulas.result }}" == "failure" ]]; then
-              echo "❌ **Formula Tests**: Failed" >> "$GITHUB_STEP_SUMMARY"
-              echo "::error::Formula tests failed"
+              echo "❌ **Formula Tests (macOS)**: Failed" >> "$GITHUB_STEP_SUMMARY"
+              echo "::error::Formula tests on macOS failed"
               exit 1
             elif [[ "${{ needs.test-formulas.result }}" == "success" ]]; then
-              echo "✅ **Formula Tests**: Passed" >> "$GITHUB_STEP_SUMMARY"
+              echo "✅ **Formula Tests (macOS)**: Passed" >> "$GITHUB_STEP_SUMMARY"
             else
-              echo "⚠️ **Formula Tests**: ${{ needs.test-formulas.result }}" >> "$GITHUB_STEP_SUMMARY"
+              echo "⚠️ **Formula Tests (macOS)**: ${{ needs.test-formulas.result }}" >> "$GITHUB_STEP_SUMMARY"
             fi
           else
-            echo "⏭️ **Formula Tests**: Skipped (no formula changes)" >> "$GITHUB_STEP_SUMMARY"
+            echo "⏭️ **Formula Tests (macOS)**: Skipped (no formula changes)" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          
+          # Formula tests on Linux (only if formulas support Linux)
+          if [[ "${{ needs.detect-changes.outputs.formula_supports_linux }}" == "true" ]]; then
+            if [[ "${{ needs.test-formulas-linux.result }}" == "failure" ]]; then
+              echo "❌ **Formula Tests (Linux)**: Failed" >> "$GITHUB_STEP_SUMMARY"
+              echo "::error::Formula tests on Linux failed"
+              exit 1
+            elif [[ "${{ needs.test-formulas-linux.result }}" == "success" ]]; then
+              echo "✅ **Formula Tests (Linux)**: Passed" >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "⚠️ **Formula Tests (Linux)**: ${{ needs.test-formulas-linux.result }}" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          else
+            echo "⏭️ **Formula Tests (Linux)**: Skipped (formulas don't support Linux)" >> "$GITHUB_STEP_SUMMARY"
           fi
           
           # Cask tests (only fail if there were cask changes and tests failed)
