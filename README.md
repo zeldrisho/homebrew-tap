@@ -3,7 +3,7 @@
 [![formulae](https://img.shields.io/github/directory-file-count/zeldrisho/homebrew-tap/Formula?type=file&extension=rb&style=flat&label=formulae)](https://github.com/zeldrisho/homebrew-tap/tree/main/Formula)
 [![repo size](https://img.shields.io/github/repo-size/zeldrisho/homebrew-tap.svg?style=flat-square)](https://github.com/zeldrisho/homebrew-tap)
 
-My personal [Homebrew tap](https://docs.brew.sh/Taps) for macOS applications missing from official taps
+My personal [Homebrew tap](https://docs.brew.sh/Taps) for packages missing from official taps
 
 ## Usage
 
@@ -21,7 +21,7 @@ brew install --cask <cask>
 
 Install a formula from this tap:
 ```bash
-brew install <cask>
+brew install <formula>
 ```
 
 ## Casks
