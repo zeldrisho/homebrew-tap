@@ -35,6 +35,6 @@ brew install <formula>
 
 |Name|Description|
 |----|-----------|
-|[bun](https://github.com/zeldrisho/homebrew-tap/blob/main/Casks/bun.rb)|Fast JavaScript runtime, bundler, transpiler and package manager|
+|[bun](https://github.com/zeldrisho/homebrew-tap/blob/main/Formula/bun.rb)|Fast JavaScript runtime, bundler, transpiler and package manager|
 |[pass-cli](https://github.com/zeldrisho/homebrew-tap/blob/main/Formula/pass-cli.rb)|Proton Pass CLI - Command-line interface for Proton Pass|
 |[smapi](https://github.com/zeldrisho/homebrew-tap/blob/main/Formula/smapi.rb)|Modding framework for Stardew Valley|

@@ -2,7 +2,7 @@ class PassCli < Formula
   desc "Proton Pass CLI - Command-line interface for Proton Pass"
   homepage "https://proton.me/pass"
   version "1.4.1"
-  license "GPL-3.0"
+  license "GPL-3.0-or-later"
 
   on_macos do
     on_intel do
