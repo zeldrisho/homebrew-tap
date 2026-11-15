@@ -10,6 +10,15 @@ class KotlinToolchain < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
+  bottle do
+    root_url "https://github.com/zeldrisho/homebrew-tap/releases/download/kotlin-toolchain-0.13.0"
+    sha256 cellar: :any_skip_relocation, arm64_golden_gate: "f7387b6797a9c949a775a41d7258c30cccfc0116dfe4dded83637dc4b6ec3882"
+    sha256 cellar: :any_skip_relocation, arm64_tahoe:       "200c35742029e0cb800d9f37ebb738e2edd9ec38584edd8c56c19fed34eeffea"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:     "ec93c0ab25a2270b40bb4acc950e0c9d3ad5f064a76ee57e0fcbf8d332885188"
+    sha256 cellar: :any_skip_relocation, arm64_linux:       "14ee4bb3d0e8256ebeb4b87e489ba950114ef6f4ef2fabb6e99b37fb24c2755c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:      "ac21af192e62f29343207f9c0dda138d71b462324f8595158146b9f8f65afaa7"
+  end
+
   depends_on "openjdk"
 
   conflicts_with "kotlin", because: "both install a `kotlin` executable"
