@@ -17,6 +17,7 @@ brew "<formula>"
 
 | Formula | Description |
 | ------- | ----------- |
+| [smali](Formula/smali.rb) | Assembler and disassembler for the Android DEX format |
 
 ## Documentation
 
