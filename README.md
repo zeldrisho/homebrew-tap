@@ -17,6 +17,7 @@ brew "<formula>"
 
 | Formula | Description |
 | ------- | ----------- |
+| [kotlin-toolchain](Formula/kotlin-toolchain.rb) | Build tool for Kotlin applications |
 | [smali](Formula/smali.rb) | Assembler and disassembler for the Android DEX format |
 
 ## Documentation
