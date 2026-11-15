@@ -8,8 +8,6 @@ Use the fully qualified name `zeldrisho/tap/<formula>`:
 | --- | --- |
 | Lint | `brew style zeldrisho/tap/<formula>` |
 | Audit | `brew audit --strict zeldrisho/tap/<formula>` |
-| Build from source | `HOMEBREW_NO_INSTALL_FROM_API=1 brew install --build-from-source zeldrisho/tap/<formula>` |
-| Test | `brew test zeldrisho/tap/<formula>` |
 
 ## Rules
 
@@ -25,6 +23,7 @@ Use the fully qualified name `zeldrisho/tap/<formula>`:
 - Keep formula PRs separate from README changes; update the formula table in `README.md` in a separate push to `main` when adding or removing formulae.
 - Do not manually edit `bottle do` blocks; bottles are managed by the publishing workflow.
 - Use commit messages `foo 1.2.3` for version updates, `foo 1.2.3 (new formula)` for additions, and `foo: fix <description>` for fixes.
+- Use the same title for the PR and its commit message.
 - Squash merge ordinary PRs; for formula PRs with bottles, use the publishing workflow instead of merging manually.
 - After a formula PR passes its checks, publish bottles with `gh workflow run publish.yml -f pull_request=<number>`; optionally add `-f head_sha=<sha>` to verify the expected head commit.
 
