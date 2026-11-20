@@ -17,6 +17,7 @@ brew "<formula>"
 
 | Formula | Description |
 | ------- | ----------- |
+| [jadx-headless-mcp](Formula/jadx-headless-mcp.rb) | Headless MCP server for Android APK static analysis |
 | [kotlin-toolchain](Formula/kotlin-toolchain.rb) | Build tool for Kotlin applications |
 | [smali](Formula/smali.rb) | Assembler and disassembler for the Android DEX format |
 
