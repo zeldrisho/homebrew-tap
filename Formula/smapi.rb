@@ -4,6 +4,7 @@ class Smapi < Formula
   url "https://github.com/Pathoschild/SMAPI/archive/refs/tags/4.5.2.tar.gz"
   sha256 "3deeba11bbc81392bc6fd925e221c64ca7bff764d1f931bea5a3d3acde41aa9d"
   license "LGPL-3.0-only"
+  revision 1
 
   livecheck do
     url :stable
@@ -65,10 +66,10 @@ class Smapi < Formula
     internal = bundle/"smapi-internal"
     internal.mkpath
 
-    %w[StardewModdingAPI.dll StardewModdingAPI.xml steam_appid.txt].each do |file|
+    %w[StardewModdingAPI StardewModdingAPI.dll StardewModdingAPI.xml steam_appid.txt].each do |file|
       bundle.install smapi_output/file if (smapi_output/file).exist?
     end
-    bundle.install "src/SMAPI.Installer/assets/unix-launcher.sh" => "StardewModdingAPI"
+    bundle.install "src/SMAPI.Installer/assets/unix-launcher.sh"
     bundle.install "src/SMAPI.Installer/assets/runtimeconfig.json" => "StardewModdingAPI.runtimeconfig.json"
 
     internal_files = Dir["#{smapi_output}/*.dll", "#{smapi_output}/*.xml"].reject do |file|
@@ -113,5 +114,12 @@ class Smapi < Formula
     output = shell_output("#{bin}/smapi --install --game-path '#{game}' --no-prompt")
     assert_match "Extracting install files...", output
     assert_match "Failed finding your game path", output
+
+    assert_path_exists libexec/"install.dat"
+    archive = shell_output("unzip -Z1 '#{libexec}/install.dat'")
+    assert_match "StardewModdingAPI\n", archive
+    assert_match "unix-launcher.sh\n", archive
+    assert_match "#!/usr/bin/env bash", shell_output("unzip -p '#{libexec}/install.dat' unix-launcher.sh")
+    assert_path_exists libexec/"SMAPI.Installer.dll"
   end
 end
