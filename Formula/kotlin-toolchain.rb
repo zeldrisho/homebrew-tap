@@ -11,12 +11,12 @@ class KotlinToolchain < Formula
   end
 
   bottle do
-    root_url "https://github.com/zeldrisho/homebrew-tap/releases/download/kotlin-toolchain-0.14.0"
-    sha256 cellar: :any_skip_relocation, arm64_golden_gate: "f74a349118efde67da29d88d824e037d30fc13b832d2bc7a24ccc9b0a5f41468"
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:       "563deec9ced72bb9e272d11fc7509f0a45f2bc95d67d580329d4449258a6e61f"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia:     "aef757c0b613044280ba18eb6ce1275d290e124bcc8ebcc5996b598af95420dd"
-    sha256 cellar: :any_skip_relocation, arm64_linux:       "e775b39481bee555f306b831db8e309a750d083136c48dc057c99bc703edfea5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:      "4372716a02bcc7a287cb940274fc632fdf9a82a6a7abea22fa55188c06cba1d0"
+    root_url "https://github.com/zeldrisho/homebrew-tap/releases/download/kotlin-toolchain-0.14.1"
+    sha256 cellar: :any_skip_relocation, arm64_golden_gate: "4e44ed40b760cd9bd21ad93d3c62594869464d36998c0cfab0f43a66b9cc697a"
+    sha256 cellar: :any_skip_relocation, arm64_tahoe:       "00c80b0805c0a9c92db301cb337c8d8351ba4ed319b5496761cb66bee1267ac1"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:     "bca2b38d76deeacdd3ed90ce517a1643f24e09f822456c6e47a09f85975cdaee"
+    sha256 cellar: :any_skip_relocation, arm64_linux:       "3678d97c941cc45f2d3849e1b4d993ec9b984e6230a1944c6aae48386782e8f9"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:      "275c15744d259cfad1afe3bbbf5a71014a9078dbe6cb8609e402b79fed73fa55"
   end
 
   depends_on "openjdk"
