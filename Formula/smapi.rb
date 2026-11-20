@@ -12,12 +12,12 @@ class Smapi < Formula
   end
 
   bottle do
-    root_url "https://github.com/zeldrisho/homebrew-tap/releases/download/smapi-4.5.2"
-    sha256 cellar: :any_skip_relocation, arm64_golden_gate: "e9ce43fb1386c11d8cebccbc41916c0b47a483474c0775aae2eb9e3a67945508"
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:       "f2c486ebe3a6b801b15af4fc9dfbc70c8196ce71fd00804a5047310f8d7727cc"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia:     "6f477f4ad7e4c654c96fb3d69d43fa3b5c2fa0f6a5fe9e2f234e636bb50f647a"
-    sha256 cellar: :any,                 arm64_linux:       "19bd291ea6e3841d0e28f1d2bc126bacc7040338f83b38ada45fdf9d6d7ec099"
-    sha256 cellar: :any,                 x86_64_linux:      "8cd62f8a35d19deea093f2bfd4349dd6e7cd1f1e284ec615daf83014ec6062c5"
+    root_url "https://github.com/zeldrisho/homebrew-tap/releases/download/smapi-4.5.2_1"
+    sha256 cellar: :any_skip_relocation, arm64_golden_gate: "51c48143bc0415f42a8dbfa1d89e27c147016a249283920d000d47fce5e02299"
+    sha256 cellar: :any_skip_relocation, arm64_tahoe:       "2637bc409251d30a1e7d1935b2420e60eb4b3c1c6a6681601c59bc9bd7a3feca"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:     "e156d65637b41b49b14ec28bd94b496c7b9a2ca607376ac9959ac0c02e938827"
+    sha256 cellar: :any,                 arm64_linux:       "11a1da5392ff8c9ae310e1e5fa3ba7c9272176cc4adf6a077704d740d6edba76"
+    sha256 cellar: :any,                 x86_64_linux:      "7ca17f9baed522116f1ff74836580acc1ae2b778da59f988f3af370dd1982740"
   end
 
   depends_on "dotnet"
