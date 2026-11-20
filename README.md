@@ -20,6 +20,7 @@ brew "<formula>"
 | [jadx-headless-mcp](Formula/jadx-headless-mcp.rb) | Headless MCP server for Android APK static analysis |
 | [kotlin-toolchain](Formula/kotlin-toolchain.rb) | Build tool for Kotlin applications |
 | [smali](Formula/smali.rb) | Assembler and disassembler for the Android DEX format |
+| [smapi](Formula/smapi.rb) | Modding framework and API for Stardew Valley |
 
 ## Documentation
 
