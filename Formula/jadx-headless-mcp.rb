@@ -5,6 +5,15 @@ class JadxHeadlessMcp < Formula
   sha256 "8a97fcd615b5ec99b9b3a6b459f68599df0baad8283cf094c1db0302ea9acf05"
   license "Apache-2.0"
 
+  bottle do
+    root_url "https://github.com/zeldrisho/homebrew-tap/releases/download/jadx-headless-mcp-0.8.0"
+    sha256 cellar: :any_skip_relocation, arm64_golden_gate: "7e5acb06a3ab9bfc8a5b225254414e25381433f2ffe65b90fa93e4393e43bd44"
+    sha256 cellar: :any_skip_relocation, arm64_tahoe:       "8bfc82bc4c8e56499a1a8dcc3a39efa0bd8812a9878da9cc3728c95e031cb5da"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:     "9e25a991a14465de1ba5ad9c5edce88cfb9e66a81d12260496a686bd62a8bd03"
+    sha256 cellar: :any_skip_relocation, arm64_linux:       "5b2d23b64a47eba6fc9c17007bfd1dd6bbdba4b0a037d21105d4253c63bf547b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:      "902fa54ad3ed988d9a92e02bfaf73152b573ca1178ef5ededcc0a8c139340d93"
+  end
+
   depends_on "gradle" => :build
   depends_on "openjdk"
 
