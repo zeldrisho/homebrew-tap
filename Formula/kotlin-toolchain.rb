@@ -1,8 +1,8 @@
 class KotlinToolchain < Formula
   desc "Build tool for Kotlin applications"
   homepage "https://kotlin-toolchain.org/"
-  url "https://packages.jetbrains.team/maven/p/amper/amper/org/jetbrains/kotlin/kotlin-cli/0.14.0/kotlin-cli-0.14.0-dist.tgz"
-  sha256 "69112cebc1fdb14c92a213244182d0834896e71b3d9411b8e8c18540da2884a6"
+  url "https://packages.jetbrains.team/maven/p/amper/amper/org/jetbrains/kotlin/kotlin-cli/0.14.1/kotlin-cli-0.14.1-dist.tgz"
+  sha256 "39fb5f7e0bd5148a02f5519e88d78752fb04e719ddb086258ff57e94d83c0fcb"
   license "Apache-2.0"
 
   livecheck do
