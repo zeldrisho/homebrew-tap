@@ -10,6 +10,15 @@ class Smapi < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
+  bottle do
+    root_url "https://github.com/zeldrisho/homebrew-tap/releases/download/smapi-4.5.2"
+    sha256 cellar: :any_skip_relocation, arm64_golden_gate: "e9ce43fb1386c11d8cebccbc41916c0b47a483474c0775aae2eb9e3a67945508"
+    sha256 cellar: :any_skip_relocation, arm64_tahoe:       "f2c486ebe3a6b801b15af4fc9dfbc70c8196ce71fd00804a5047310f8d7727cc"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:     "6f477f4ad7e4c654c96fb3d69d43fa3b5c2fa0f6a5fe9e2f234e636bb50f647a"
+    sha256 cellar: :any,                 arm64_linux:       "19bd291ea6e3841d0e28f1d2bc126bacc7040338f83b38ada45fdf9d6d7ec099"
+    sha256 cellar: :any,                 x86_64_linux:      "8cd62f8a35d19deea093f2bfd4349dd6e7cd1f1e284ec615daf83014ec6062c5"
+  end
+
   depends_on "dotnet"
   uses_from_macos "zip" => :build
 
