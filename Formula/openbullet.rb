@@ -6,6 +6,15 @@ class Openbullet < Formula
   license "MIT"
   head "https://github.com/openbullet/OpenBullet2.git", branch: "master"
 
+  bottle do
+    root_url "https://github.com/zeldrisho/homebrew-tap/releases/download/openbullet-2.0.1"
+    sha256 cellar: :any,                 arm64_golden_gate: "d2d8f35f67c456954cdf3612ef644fd859fdc586c3660cee24d81f73016db746"
+    sha256 cellar: :any,                 arm64_tahoe:       "c205a03490a67ff398786e452d1f6a73a7217ff534f95eedbd10aeebb874b439"
+    sha256 cellar: :any,                 arm64_sequoia:     "a7b7b4fc60c83d3c2b41f828552ee37b1172061988e8d37dd0ee3f2b1704e13c"
+    sha256 cellar: :any_skip_relocation, arm64_linux:       "ef97d8e4f6c1a9f6dc165074f48632dae455aab686ec2445fc6989defee7bbbe"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:      "6a8dcde0e0b1abe855425366abdc847b366b9d44b39184b5bce756062e7a2973"
+  end
+
   depends_on "node" => :build
   depends_on "dotnet"
 
