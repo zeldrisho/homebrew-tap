@@ -6,6 +6,15 @@ class Lightpanda < Formula
   license "AGPL-3.0-only"
   head "https://github.com/lightpanda-io/browser.git", branch: "main"
 
+  bottle do
+    root_url "https://github.com/zeldrisho/homebrew-tap/releases/download/lightpanda-1.0.4"
+    sha256 cellar: :any_skip_relocation, arm64_golden_gate: "32c98929d21038e84faad3fd94d4d997a519965cde14eb0466c6769b076e110f"
+    sha256 cellar: :any_skip_relocation, arm64_tahoe:       "16c12c5f1651efb15071d0e4d9704944a1eef30cb14c0d58c2ac678cb17bae52"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:     "63fc5f8e353a66dc70403bb022c266cd8c3c8a542eabe143828398ab9a796fbc"
+    sha256 cellar: :any_skip_relocation, arm64_linux:       "cd590679b1af76edd96d6499530b6787efabad7e384e05b73b08a780976b005d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:      "ced577a9cad3155a62e5039df5b56d135ce3ee2feeef7e1ae52c9dad6f38891d"
+  end
+
   depends_on "glib" => :build
   depends_on "pkgconf" => :build
   depends_on "rust" => :build
