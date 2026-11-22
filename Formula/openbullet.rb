@@ -6,6 +6,13 @@ class Openbullet < Formula
   license "MIT"
   head "https://github.com/openbullet/OpenBullet2.git", branch: "master"
 
+  livecheck do
+    url "https://api.github.com/repos/openbullet/OpenBullet2/releases/latest"
+    strategy :json do |json|
+      json["tag_name"]
+    end
+  end
+
   bottle do
     root_url "https://github.com/zeldrisho/homebrew-tap/releases/download/openbullet-2.0.1"
     sha256 cellar: :any,                 arm64_golden_gate: "d2d8f35f67c456954cdf3612ef644fd859fdc586c3660cee24d81f73016db746"
