@@ -1,8 +1,8 @@
 class Lightpanda < Formula
   desc "Headless browser designed for web automation"
   homepage "https://github.com/lightpanda-io/browser"
-  url "https://github.com/lightpanda-io/browser/archive/refs/tags/1.0.4.tar.gz"
-  sha256 "1a6012705a755b76eade6836f0af628256384685af5adbb124dd2af21508077d"
+  url "https://github.com/lightpanda-io/browser/archive/refs/tags/1.0.5.tar.gz"
+  sha256 "fa7994eafae74335e73699870f67156feefa0a4f19d612baccaff24cf5a4c9d1"
   license "AGPL-3.0-only"
   head "https://github.com/lightpanda-io/browser.git", branch: "main"
 
