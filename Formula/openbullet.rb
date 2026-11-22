@@ -1,8 +1,8 @@
 class Openbullet < Formula
   desc "Cross-platform web automation suite"
   homepage "https://github.com/openbullet/OpenBullet2"
-  url "https://github.com/openbullet/OpenBullet2/archive/refs/tags/2.0.1.tar.gz"
-  sha256 "13aada62e6e14200b6b119424222cb8f134b1ec7f9139bb4630daf9c8584275c"
+  url "https://github.com/openbullet/OpenBullet2/archive/refs/tags/2.0.1.3183.tar.gz"
+  sha256 "e72b1e288a3de79f1ac1cffc80a539fc2dff034a26dd5c3c5541478f827ae14f"
   license "MIT"
   head "https://github.com/openbullet/OpenBullet2.git", branch: "master"
 
