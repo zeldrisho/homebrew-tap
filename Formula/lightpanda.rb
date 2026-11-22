@@ -7,12 +7,12 @@ class Lightpanda < Formula
   head "https://github.com/lightpanda-io/browser.git", branch: "main"
 
   bottle do
-    root_url "https://github.com/zeldrisho/homebrew-tap/releases/download/lightpanda-1.0.4"
-    sha256 cellar: :any_skip_relocation, arm64_golden_gate: "32c98929d21038e84faad3fd94d4d997a519965cde14eb0466c6769b076e110f"
-    sha256 cellar: :any_skip_relocation, arm64_tahoe:       "16c12c5f1651efb15071d0e4d9704944a1eef30cb14c0d58c2ac678cb17bae52"
-    sha256 cellar: :any_skip_relocation, arm64_sequoia:     "63fc5f8e353a66dc70403bb022c266cd8c3c8a542eabe143828398ab9a796fbc"
-    sha256 cellar: :any_skip_relocation, arm64_linux:       "cd590679b1af76edd96d6499530b6787efabad7e384e05b73b08a780976b005d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:      "ced577a9cad3155a62e5039df5b56d135ce3ee2feeef7e1ae52c9dad6f38891d"
+    root_url "https://github.com/zeldrisho/homebrew-tap/releases/download/lightpanda-1.0.5"
+    sha256 cellar: :any_skip_relocation, arm64_golden_gate: "63f55b8533901ca80d176744503f50433a44211ed6765a4197867b4efaf333e8"
+    sha256 cellar: :any_skip_relocation, arm64_tahoe:       "82e2c5e8025f0c713a03f21c2c911a92b441dcdfa304b1c4773b0a6814fda7d0"
+    sha256 cellar: :any_skip_relocation, arm64_sequoia:     "2545a693244595a41a555dc76f62d39ceb970f345e19c756bb63b229e5bcd8cc"
+    sha256 cellar: :any_skip_relocation, arm64_linux:       "831d79046ee85ddcdbc8de6dc18f9b90f7c20160808271c020027b0bc6cbfe5f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:      "cdf400e6969783e38897a776eed8eee47029d2e1d85ebdf92dfd1bac4344d24b"
   end
 
   depends_on "glib" => :build
