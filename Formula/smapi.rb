@@ -31,12 +31,15 @@ class Smapi < Formula
   allow_network_access! :build
 
   def runtime
-    return "linux-#{Hardware::CPU.arm? ? "arm64" : "x64"}" if OS.linux?
+    return Hardware::CPU.arm? ? "linux-arm64" : "linux-x64" if OS.linux?
 
     Hardware::CPU.arm? ? "osx-arm64" : "osx-x64"
   end
 
   def publish_args
+    target_os = OS.mac? ? "OSX" : "Unix"
+    target_arch = Hardware::CPU.arm? ? "ARM64" : "x64"
+
     %W[
       --configuration Release
       --framework net6.0
@@ -44,8 +47,8 @@ class Smapi < Formula
       --no-self-contained
       -p:CopyToGameFolder=false
       -p:GamePath=#{buildpath}/reference-assemblies
-      -p:OS=#{OS.mac? ? "OSX" : "Unix"}
-      -p:PlatformTarget=#{Hardware::CPU.arm? ? "ARM64" : "x64"}
+      -p:OS=#{target_os}
+      -p:PlatformTarget=#{target_arch}
       -p:PublishTrimmed=false
       -p:RollForward=LatestMajor
     ]
