@@ -2,15 +2,19 @@
 
 ## Installation
 
-`brew install zeldrisho/tap/<formula>`
+```sh
+brew install zeldrisho/tap/<formula>
+brew install --cask zeldrisho/tap/<cask>
+```
 
-Or `brew tap zeldrisho/tap` and then `brew install <formula>`.
+Or run `brew tap zeldrisho/tap` first, then install using just the formula or cask name.
 
 Or, in a `brew bundle` `Brewfile`:
 
 ```ruby
 tap "zeldrisho/tap"
 brew "<formula>"
+cask "<cask>"
 ```
 
 ## Formulae
@@ -23,6 +27,13 @@ brew "<formula>"
 | [openbullet](Formula/openbullet.rb) | Cross-platform web automation suite |
 | [smali](Formula/smali.rb) | Assembler and disassembler for the Android DEX format |
 | [smapi](Formula/smapi.rb) | Modding framework and API for Stardew Valley |
+
+## Casks
+
+| Cask | Description |
+| ---- | ----------- |
+| [alacritty](Casks/alacritty.rb) | GPU-accelerated terminal emulator |
+| [maciconchanger](Casks/maciconchanger.rb) | Customise app and folder icons |
 
 ## Documentation
 
