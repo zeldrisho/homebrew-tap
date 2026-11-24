@@ -34,6 +34,8 @@ cask "<cask>"
 | ---- | ----------- |
 | [alacritty](Casks/alacritty.rb) | GPU-accelerated terminal emulator |
 | [maciconchanger](Casks/maciconchanger.rb) | Customise app and folder icons |
+| [openkey](Casks/openkey.rb) | Vietnamese input system |
+| [pot](Casks/pot.rb) | Text translation and recognition |
 
 ## Documentation
 
