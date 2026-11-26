@@ -6,6 +6,7 @@ class V8 < Formula
   url "https://github.com/v8/v8/archive/refs/tags/15.9.128.11.tar.gz"
   sha256 "b905c8aee902d904d3e02bb1f0e110f27343c729fe9f730fdb61c09fc60da678"
   license "BSD-3-Clause"
+  revision 1
 
   livecheck do
     url "https://chromiumdash.appspot.com/fetch_releases?channel=Stable&platform=Mac"
