@@ -7,10 +7,9 @@ class Openbullet < Formula
   head "https://github.com/openbullet/OpenBullet2.git", branch: "master"
 
   livecheck do
-    url "https://api.github.com/repos/openbullet/OpenBullet2/releases/latest"
-    strategy :json do |json|
-      json["tag_name"]
-    end
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+    strategy :github_latest
   end
 
   bottle do
@@ -83,7 +82,6 @@ class Openbullet < Formula
       cd "#{libexec}"
       exec "#{libexec}/OpenBullet2.Web" --contentRoot "#{libexec}" "$@"
     SH
-    chmod 0755, bin/"openbullet"
     (var/"lib/openbullet").mkpath
   end
 
