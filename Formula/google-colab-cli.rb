@@ -8,6 +8,15 @@ class GoogleColabCli < Formula
   license "Apache-2.0"
   head "https://github.com/googlecolab/google-colab-cli.git", branch: "main"
 
+  bottle do
+    root_url "https://github.com/zeldrisho/homebrew-tap/releases/download/google-colab-cli-0.8.0"
+    sha256 cellar: :any, arm64_golden_gate: "3cd4ab3314fa7bf67f8b161917d630f7cfd62001e9f40bc556a45dac961fcf23"
+    sha256 cellar: :any, arm64_tahoe:       "233e5822b13514480a3b4bf4b754385c47ba4a73d8ff13aa6a7a65fd419e5c04"
+    sha256 cellar: :any, arm64_sequoia:     "fdc5626a8993e89075462d50fc225ee4557d159c1594adc3153df06ef0cf792a"
+    sha256 cellar: :any, arm64_linux:       "f72dce09c27d16159918e399c79a425d3374f0174646728471a8302a0f0fba0d"
+    sha256 cellar: :any, x86_64_linux:      "8d63faa194a670634a8a2bdaa6a32a1f150fa5024850e564cc43e17b7381c41d"
+  end
+
   depends_on "cmake" => :build
   depends_on "libyaml" => :build
   depends_on "ninja" => :build
