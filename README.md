@@ -21,6 +21,7 @@ cask "<cask>"
 
 | Formula | Description |
 | ------- | ----------- |
+| [google-colab-cli](Formula/google-colab-cli.rb) | Command-line interface for Google Colab |
 | [jadx-headless-mcp](Formula/jadx-headless-mcp.rb) | Headless MCP server for Android APK static analysis |
 | [kotlin-toolchain](Formula/kotlin-toolchain.rb) | Build tool for Kotlin applications |
 | [lightpanda](Formula/lightpanda.rb) | Headless browser designed for web automation |
