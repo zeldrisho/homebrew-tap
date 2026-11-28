@@ -14,28 +14,12 @@ class Smali < Formula
     sha256 cellar: :any_skip_relocation, x86_64_linux:      "198f52c2f0db0d2d95aa726a69cb1803ac7f09578e1e44810871a0573e10608a"
   end
 
-  depends_on "gradle" => :build
+  depends_on "gradle@8" => :build
   depends_on "openjdk"
 
   allow_network_access! :build
 
   def install
-    ENV["JAVA_HOME"] = formula_opt_prefix("openjdk")
-
-    # Gradle 9 removed the legacy JavaExec `main` property.
-    inreplace "dexlib2/build.gradle",
-              "main = 'com.android.tools.smali.dexlib2.AccessorTestGenerator'",
-              "mainClass = 'com.android.tools.smali.dexlib2.AccessorTestGenerator'"
-    inreplace "dexlib2/build.gradle", "main 'com.android.dx.command.Main'",
-              "mainClass = 'com.android.dx.command.Main'"
-    inreplace "smali/build.gradle", "resource: archivePath", "resource: archiveFile.get().asFile"
-    inreplace "baksmali/build.gradle", "resource: archivePath", "resource: archiveFile.get().asFile"
-    # Gradle 9's IDEA model no longer provides testSourceDirs.
-    inreplace "smali/build.gradle", "sourceDirs + testSourceDirs", "sourceDirs"
-    # Gradle 9 requires the generated ANTLR sources' dependency to be explicit.
-    inreplace "smali/build.gradle", "sourcesJar.dependsOn('generateGrammarSource')",
-              "sourcesJar.dependsOn('generateGrammarSource')\ncompileJava.dependsOn('generateGrammarSource')"
-
     system "gradle", "--no-daemon", "smali:fatJar", "baksmali:fatJar"
 
     libexec.install buildpath.glob("{smali,baksmali}/build/libs/*-fat.jar")
